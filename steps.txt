@@ -1,0 +1,12 @@
+1. write a Dockerfile
+2. docker build -t myapp .
+3. docker create network mynet
+
+start the db in mynet
+4. docker run -d --network=mynet --name=mydb stackupiss/northwind-db:v1
+
+5. docker volume create myvol
+6. docker run -d -v myvol:/var/lib/mysql --network=mynet --name=mydb stackupiss/northwind-db:v1 
+
+start the myapp in mynet
+7. docker run -d -e DB_USER=root -e DB_PASSWORD=changeit -p 3000:3000 --network=mynet --name=myapp myapp
