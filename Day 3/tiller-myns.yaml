@@ -1,0 +1,24 @@
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+    name: tiller-myns
+    namespace: myns
+
+---
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tiller-myns-crb
+  namespace: myns
+subjects:
+- kind: ServiceAccount
+  name: tiller-myns
+  namespace: myns
+
+roleRef: 
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: admin #different from Cluster-admin, can only manage within it's own namespace
+  
