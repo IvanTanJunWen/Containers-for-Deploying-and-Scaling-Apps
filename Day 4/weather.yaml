@@ -1,0 +1,96 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: weatherns
+  labels:
+    name: weatherns 
+
+---
+kind: Service
+apiVersion: v1
+
+metadata:
+    name: weather-svc
+    namespace: weatherns
+    labels:
+        app: weather-svc
+spec:
+  type: ClusterIP
+  selector:
+      app: weather-pod
+  ports:
+  - name: weather-svc-port
+    port: 80
+    targetPort: weather-port
+
+---
+kind: Secret
+apiVersion: v1
+metadata:
+    name: weather-secret
+    namespace: weatherns
+    labels:
+        app: weather-secret
+
+data:
+    api_key: YWExODE2MTE3MmZiNTdjYjU3MTgwNDZmNWY5MjZhOTU=
+
+---
+kind: Deployment
+apiVersion: apps/v1
+
+metadata:
+    name: weather-deploy
+    namespace: weatherns
+    labels:
+        app: weather-deploy
+
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: weather-pod
+    template:
+        metadata:
+            name: weather-pod
+            labels:
+                app: weather-pod
+                version: v1
+        spec:
+            containers:
+            - name: weatherapp
+              image: stackupiss/weather:v1
+              imagePullPolicy: Always
+
+              env:
+              - name: APP_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: weather-secret
+                    key: api_key
+              ports:
+              - name: weather-port
+                containerPort: 3000
+
+---
+kind: Ingress
+apiVersion: networking.k8s.io/v1beta1
+
+metadata:
+    name: weather-ing
+    namespace: weatherns
+    labels:
+        name: weather-ing
+    annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+spec:
+    rules:
+    - http:
+        paths:
+        - path: /weather(/|$)(.*) 
+          backend:
+            serviceName: weather-svc
+            servicePort: 80
