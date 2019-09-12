@@ -6,15 +6,16 @@ metadata:
     name: mydb-pvc
     namespace: myns
     labels:
-      name: mydb-pvc
+        name: mydb-pvc
     annotations:
-      volume.beta.kubernetes.io/storage-provisioner: dobs.csi.digitalocean.com
-    
+        volume.beta.kubernetes.io/storage-provisioner: dobs.csi.digitalocean.com
 
-spec: 
-  accessModes:
+spec:
+    accessModes:
     - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi 
-  storageClassName: do-block-storage
+    resources:
+        requests:
+            storage: 10Gi
+    storageClassName: do-block-storage
+
+
